@@ -64,7 +64,7 @@ namespace FogBugz.Api.JsonApi
             return result;
         }
 
-        public async Task<Models.Response.ViewCase> ViewCase(int caseNumber, string token)
+        public async Task<Models.Response.ViewCase> ViewCaseAsync(int caseNumber, string token)
         {
             string request = $"{BaseUrl}/viewCase";
             var parms = new Models.Request.ViewCase() { ixBug = caseNumber, token = token };
@@ -82,7 +82,7 @@ namespace FogBugz.Api.JsonApi
             return result;
         }
 
-        public async Task<Models.Response.ListCases> ListCases(string filterId, string[] cols, int max, string token)
+        public async Task<Models.Response.ListCases> ListCasesAsync(string filterId, string[] cols, int max, string token)
         {
             string request = $"{BaseUrl}/listCases";
             var parms = new Models.Request.ListCases() { sFilter = filterId, cols = cols, max = max, token = token };
@@ -100,7 +100,7 @@ namespace FogBugz.Api.JsonApi
             return result;
         }
 
-        public async Task<Models.Response.ListProjects> ListProjects(string token)
+        public async Task<Models.Response.ListProjects> ListProjectsAsync(string token)
         {
             string request = $"{BaseUrl}/listProjects";
             var parms = new Models.Request.ListProjects() { fWrite = 0, ixProject = 0, fDeleted = 0, token = token };
@@ -111,6 +111,24 @@ namespace FogBugz.Api.JsonApi
                 return new();
 
             Models.Response.ListProjects? result = await response.Content.ReadFromJsonAsync<Models.Response.ListProjects>();
+
+            if (result is null)
+                return new();
+
+            return result;
+        }
+
+        public async Task<Models.Response.FullCaseDetails> FullCaseDetailsAsync(int caseNumber, string[] cols, string token)
+        {
+            string request = $"{BaseUrl}/search";
+            var parms = new Models.Request.FullCaseDetails() { q = caseNumber, cols = cols, token = token };
+            using var httpClient = GetHttpClient();
+            using var response = await httpClient.PostAsJsonAsync(request, parms);
+
+            if (!response.IsSuccessStatusCode)
+                return new();
+
+            Models.Response.FullCaseDetails? result = await response.Content.ReadFromJsonAsync<Models.Response.FullCaseDetails>();
 
             if (result is null)
                 return new();
