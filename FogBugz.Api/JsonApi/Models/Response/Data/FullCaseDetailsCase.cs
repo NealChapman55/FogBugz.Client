@@ -42,16 +42,16 @@
         public int ixMailbox { get; set; }
         public int ixCategory { get; set; }
         public string sCategory { get; set; } = string.Empty;
-        public DateTime dtOpened { get; set; }
-        public DateTime dtResolved { get; set; }
-        public DateTime dtClosed { get; set; }
+        public string dtOpened { get; set; }
+        public string dtResolved { get; set; }
+        public string dtClosed { get; set; }
         public int ixBugEventLatest { get; set; }
         public DateTime dtLastUpdated { get; set; }
         public bool fReplied { get; set; }
         public bool fForwarded { get; set; }
         public string sTicket { get; set; } = string.Empty;
         public int ixDiscussTopic { get; set; }
-        public DateTime dtDue { get; set; }
+        public string dtDue { get; set; }
         public string sReleaseNotes { get; set; } = string.Empty;
         public int ixBugEventLastView { get; set; }
         public DateTime dtLastView { get; set; }
@@ -63,5 +63,6 @@
         public bool fSubscribed { get; set; }
         public decimal dblStoryPts { get; set; }
         public int nFixForOrder { get; set; }
+        public List<FullCaseDetailsEvent> events { get; set; } = new();
     }
 }

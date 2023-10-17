@@ -36,14 +36,14 @@ internal class Program
 
         await Logon(client, token);
 
-        int caseNumber = 18082;
-        await ViewCase(client, token, caseNumber);
+        int caseNumber = 24337;
+        //await ViewCase(client, token, caseNumber);
         await ViewCaseDetail(client, token, caseNumber);
 
-        string filterId = "629";
-        await ViewCasesInFilter(client, token, filterId);
+        //string filterId = "629";
+        //await ViewCasesInFilter(client, token, filterId);
 
-        await ViewProjects(client, token);
+        //await ViewProjects(client, token);
     }
 
     private static async Task CheckApiVersion(FogBugz.Api.JsonApi.FogBugzClient client)
@@ -74,9 +74,53 @@ internal class Program
     private static async Task ViewCaseDetail(FogBugz.Api.JsonApi.FogBugzClient client, string token, int caseNumber)
     {
         Console.WriteLine($"Looking up detail for case number {caseNumber}.");
-        string[] cols = { "events" };
+        string[] cols = { "sProject", "sArea", "sTitle", "sStatus", "sPersonAssignedTo", "sPriority", "sCategory", "dtOpened", "dtResolved", "dtClosed", "dtDue", "sReleaseNotes", "ixBugParent", "ixBugChildren", "tags", "sFixFor", "ixRelatedBugs", "events" };
         var caseDetail = await client.FullCaseDetailsAsync(caseNumber, cols, token);
-        Console.WriteLine($"Found: {caseDetail.data.cases[0].ixBug} - {caseDetail.data.cases[0].sTitle}");
+
+        foreach (var item in caseDetail.data.cases)
+        {
+            Console.WriteLine($"Project: {item.sProject}");
+            Console.WriteLine($"Area: {item.sArea}");
+            Console.WriteLine($"Milestone: {item.sFixFor}");
+            Console.WriteLine($"Case: {item.ixBug}");
+            Console.WriteLine($"Title: {item.sTitle}");
+            Console.WriteLine($"Person Assigned To: {item.sPersonAssignedTo}");
+            Console.WriteLine($"Status: {item.sStatus}");
+            Console.WriteLine($"Priority: {item.sPriority}");
+            Console.WriteLine($"Category: {item.sCategory}");
+            Console.WriteLine($"Date Opened: {item.dtOpened}");
+            Console.WriteLine($"Date Resolved: {item.dtResolved}");
+            Console.WriteLine($"Date Closed: {item.dtClosed}");
+            Console.WriteLine($"Date Due: {item.dtDue}");
+            Console.WriteLine($"Release Notes: {item.sReleaseNotes}");
+            Console.WriteLine($"Parent Case: {item.ixBugParent}");
+            Console.WriteLine($"Child Cases: {string.Join(',', item.ixBugChildren)}");
+            Console.WriteLine($"Tags: {string.Join(',', item.tags)}");
+            Console.WriteLine($"Related Cases: {string.Join(',', item.ixRelatedBugs)}");
+            
+            Console.WriteLine("Events:");
+
+            foreach (var itemEvent in item.events)
+            {
+                Console.WriteLine($"----{itemEvent.dt} - {itemEvent.sVerb} - {itemEvent.evtDescription}");
+                
+                if (itemEvent.bEmail)
+                {
+                    Console.WriteLine($"----From: {itemEvent.sFrom}");
+                    Console.WriteLine($"----To: {itemEvent.sTo}");
+                    Console.WriteLine($"----Subject: {itemEvent.sSubject}");
+                    Console.WriteLine($"----Date: {itemEvent.sDate}");
+                    Console.WriteLine($"----Body: {itemEvent.sBodyText}");
+                }
+                else if (!string.IsNullOrEmpty(itemEvent.s))
+                {
+                    Console.WriteLine($"----{itemEvent.s}");
+                }
+                
+                Console.WriteLine();
+            }
+        }
+
         Console.WriteLine("");
     }
 
@@ -91,7 +135,7 @@ internal class Program
             Console.WriteLine($"{item.sProject} - {item.sArea} - {item.ixBug} - {item.sTitle} - {item.sPersonAssignedTo}");
             foreach (var evt in item.events)
             {
-                Console.WriteLine($"----{evt.dt} - {evt.sVerb}");
+                Console.WriteLine($"----{evt.dt} - {evt.sVerb} - {evt.s}");
             }
         }
         Console.WriteLine("");
